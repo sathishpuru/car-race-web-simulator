@@ -3,8 +3,10 @@ import { motion } from 'framer-motion';
 
 const Car = ({ position }: { position: { x: number; y: number } }) => {
   return (
-    <motion.div
-      className="absolute w-10 h-20 bg-red-500 rounded-t-full rounded-b-md"
+    <motion.img
+      src="/car.svg"
+      alt="Car"
+      className="absolute w-10 h-20"
       style={{
         left: `${position.x}%`,
         top: `${position.y}%`,
