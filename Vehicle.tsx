@@ -72,7 +72,7 @@ export const Vehicle = () => {
 
   useFrame((_state, delta) => {
     if (!body.current) return;
-
+a
     const impulse = { x: 0, y: 0, z: 0 };
     const torque = { x: 0, y: 0, z: 0 };
 

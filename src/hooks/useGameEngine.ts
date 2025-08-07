@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
@@ -9,7 +8,7 @@ const useGameEngine = () => {
   const [score, setScore] = useState(0);
   const [gameOver, setGameOver] = useState(false);
   const [carVelocity, setCarVelocity] = useState(0);
-  const [acceleration, setAcceleration] = useState(0);
+  const [keys, setKeys] = useState({ ArrowLeft: false, ArrowRight: false });
 
   const resetGame = () => {
     setCarPosition({ x: 50, y: 80 });
@@ -17,29 +16,20 @@ const useGameEngine = () => {
     setScore(0);
     setGameOver(false);
     setCarVelocity(0);
-    setAcceleration(0);
+    setKeys({ ArrowLeft: false, ArrowRight: false });
   };
 
   const handleKeyDown = useCallback((e: KeyboardEvent) => {
     if (gameOver) return;
-
-    switch (e.key) {
-      case 'ArrowLeft':
-        setAcceleration(-0.5);
-        break;
-      case 'ArrowRight':
-        setAcceleration(0.5);
-        break;
-      default:
-        break;
+    if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+      setKeys((prev) => ({ ...prev, [e.key]: true }));
     }
   }, [gameOver]);
 
   const handleKeyUp = useCallback((e: KeyboardEvent) => {
     if (gameOver) return;
-
     if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
-      setAcceleration(0);
+      setKeys((prev) => ({ ...prev, [e.key]: false }));
     }
   }, [gameOver]);
 
@@ -57,11 +47,11 @@ const useGameEngine = () => {
 
     const gameLoop = setInterval(() => {
       // Move car
-      setCarVelocity((prev) => prev + acceleration);
-      setCarVelocity((prev) => prev * 0.95); // Friction
+      const newVelocity = (carVelocity + (keys.ArrowRight ? 0.5 : 0) - (keys.ArrowLeft ? 0.5 : 0)) * 0.95;
+      setCarVelocity(newVelocity);
       setCarPosition((prev) => ({
         ...prev,
-        x: Math.max(0, Math.min(100, prev.x + carVelocity)),
+        x: Math.max(0, Math.min(100, prev.x + newVelocity)),
       }));
 
       // Move opponents
@@ -95,7 +85,7 @@ const useGameEngine = () => {
     }, 50);
 
     return () => clearInterval(gameLoop);
-  }, [opponents, carPosition, gameOver, carVelocity, score]);
+  }, [opponents, carPosition, gameOver, carVelocity, score, keys.ArrowLeft, keys.ArrowRight]);
 
   return { carPosition, opponents, score, gameOver, resetGame };
 };
